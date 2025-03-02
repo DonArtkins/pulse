@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { usePageStore } from "@/stores/page";
 import { useRoute } from "vue-router";
+
+usePageStore().pageData.title = 'Tasks Details'
 
 const route = useRoute();
 </script>

@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { usePageStore } from '@/stores/page';
 
+usePageStore().pageData.title = '404 Error'
 </script>
 
 <template>

@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { useRoute } from "vue-router";
+import { usePageStore } from '@/stores/page';
+import { useRoute } from 'vue-router';
+
+usePageStore().pageData.title = 'Projects Details'
 
 const route = useRoute();
 </script>

@@ -4,18 +4,20 @@ import { supabase } from "@/lib/supabaseClient";
 import { h, ref } from "vue";
 import type { Tables } from "../../../database/types";
 import type { ColumnDef } from "@tanstack/vue-table";
-import { DataTable } from "@/components";
+import { usePageStore } from "@/stores/page";
 
-const projects = ref<Tables<"projects">[] | null>(null);
+usePageStore().pageData.title = 'Projects'
 
-(async () => {
-  //imediately invoked function
+const projects = ref<Tables<"projects">[] | null>(null)
+const getProjects = async () => {
   const { data, error } = await supabase.from("projects").select();
 
   if (error) console.log(error);
 
   projects.value = data;
-})();
+}
+
+await getProjects()
 
 const columns: ColumnDef<Tables<"projects">>[] = [
   {

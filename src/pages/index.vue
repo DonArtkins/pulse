@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { RouterLink } from "vue-router";
+import { usePageStore } from '@/stores/page';
+
+usePageStore().pageData.title = 'Dashboard'
 </script>
 
 <template>
