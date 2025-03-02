@@ -17,45 +17,48 @@ const tasks = ref<Tables<"tasks">[] | null>(null);
   tasks.value = data;
 })();
 
-interface Payment {
-  id: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
-  email: string;
-}
-
-const payments: Payment[] = [
+const columns: ColumnDef<Tables<"tasks">>[] = [
   {
-    id: "728ed52f",
-    amount: 100,
-    status: "pending",
-    email: "m@example.com",
-  },
-  {
-    id: "489e1d42",
-    amount: 125,
-    status: "processing",
-    email: "example@gmail.com",
-  },
-];
-
-const columns: ColumnDef<Payment>[] = [
-  {
-    accessorKey: "amount",
-    header: () => h("div", { class: "text-right" }, "Amount"),
+    accessorKey: "name",
+    header: () => h("div", { class: "text-left" }, "Name"),
     cell: ({ row }) => {
-      const amount = Number.parseFloat(row.getValue("amount"));
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount);
-
-      return h("div", { class: "text-right font-medium" }, formatted);
+      /**
+       * The `h` tag is a vue fuction that returns html elements and it accepts 3 arguments (string to rep tag name or component instance, object that has properties for the attributes and finally the last argument and whatever is passed to it will be placed inside the element)
+       */
+      return h("div", { class: "text-left font-medium" }, row.getValue("name"));
+    },
+  },
+  {
+    accessorKey: "status",
+    header: () => h("div", { class: "text-left" }, "Status"),
+    cell: ({ row }) => {
+      return h("div", { class: "text-left font-medium" }, row.getValue("status"));
+    },
+  },
+  {
+    accessorKey: "due_date",
+    header: () => h("div", { class: "text-left" }, "Due Date"),
+    cell: ({ row }) => {
+      return h("div", { class: "text-left font-medium" }, row.getValue("due_date"));
+    },
+  },
+  {
+    accessorKey: "project_id",
+    header: () => h("div", { class: "text-left" }, "Project Id"),
+    cell: ({ row }) => {
+      return h("div", { class: "text-left font-medium" }, row.getValue("project_id"));
+    },
+  },
+  {
+    accessorKey: "collaborators",
+    header: () => h("div", { class: "text-left" }, "Collaborators"),
+    cell: ({ row }) => {
+      return h("div", { class: "text-left font-medium" }, JSON.stringify(row.getValue("collaborators")));
     },
   },
 ];
 </script>
 
 <template>
-  <DataTable :columns="columns" :data="payments" />
+  <DataTable v-if="tasks" :columns="columns" :data="tasks" />
 </template>
