@@ -25,7 +25,7 @@ const columns: ColumnDef<Tables<"tasks">>[] = [
       /**
        * The `h` tag is a vue fuction that returns html elements and it accepts 3 arguments (string to rep tag name or component instance, object that has properties for the attributes and finally the last argument and whatever is passed to it will be placed inside the element)
        */
-      return h("div", { class: "text-left font-medium" }, row.getValue("name"));
+       return h(RouterLink, { to:`/tasks/${ row.original.id }`, class: "text-left font-medium hover:bg-muted" }, () => row.getValue("name"));
     },
   },
   {
