@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { RouterView } from "vue-router";
-import { supabase } from "@/lib/supabaseClient";
-import { SideBar, TopNavBar } from "@/components";
+import { usePageStore } from '@/stores/page';
+import { storeToRefs } from 'pinia';
+
+const { pageData } = storeToRefs(usePageStore())
 </script>
 
 <template>
@@ -10,7 +11,7 @@ import { SideBar, TopNavBar } from "@/components";
     <TopNavBar />
     <main class="flex flex-col flex-1 gap-4 p-4 lg:gap-6 lg:p-6">
       <div class="flex items-center">
-        <h1 class="text-lg font-semibold md:text-2xl">Page Title</h1>
+        <h1 class="text-lg font-semibold md:text-2xl">{{ pageData.title }}</h1>
       </div>
       <slot />
     </main>

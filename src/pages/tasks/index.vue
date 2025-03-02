@@ -1,32 +1,68 @@
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
 import { supabase } from "@/lib/supabaseClient";
-import { ref } from "vue";
+import { h, ref } from "vue";
 import type { Tables } from "../../../database/types";
+import type { ColumnDef } from "@tanstack/vue-table";
+import { usePageStore } from "@/stores/page";
 
-const tasks = ref<Tables<"tasks">[] | null>(null);
+usePageStore().pageData.title = 'My Tasks'
 
-(async () => {
+const tasks = ref<Tables<"tasks">[] | null>(null)
+
+const getTasks = async () => {
   //imediately invoked function
   const { data, error } = await supabase.from("tasks").select();
 
   if (error) console.log(error);
 
   tasks.value = data;
-})();
+}
+
+await getTasks()
+
+const columns: ColumnDef<Tables<"tasks">>[] = [
+  {
+    accessorKey: "name",
+    header: () => h("div", { class: "text-left" }, "Name"),
+    cell: ({ row }) => {
+      /**
+       * The `h` tag is a vue fuction that returns html elements and it accepts 3 arguments (string to rep tag name or component instance, object that has properties for the attributes and finally the last argument and whatever is passed to it will be placed inside the element)
+       */
+       return h(RouterLink, { to:`/tasks/${ row.original.id }`, class: "text-left font-medium hover:bg-muted" }, () => row.getValue("name"));
+    },
+  },
+  {
+    accessorKey: "status",
+    header: () => h("div", { class: "text-left" }, "Status"),
+    cell: ({ row }) => {
+      return h("div", { class: "text-left font-medium" }, row.getValue("status"));
+    },
+  },
+  {
+    accessorKey: "due_date",
+    header: () => h("div", { class: "text-left" }, "Due Date"),
+    cell: ({ row }) => {
+      return h("div", { class: "text-left font-medium" }, row.getValue("due_date"));
+    },
+  },
+  {
+    accessorKey: "project_id",
+    header: () => h("div", { class: "text-left" }, "Project Id"),
+    cell: ({ row }) => {
+      return h("div", { class: "text-left font-medium" }, row.getValue("project_id"));
+    },
+  },
+  {
+    accessorKey: "collaborators",
+    header: () => h("div", { class: "text-left" }, "Collaborators"),
+    cell: ({ row }) => {
+      return h("div", { class: "text-left font-medium" }, JSON.stringify(row.getValue("collaborators")));
+    },
+  },
+];
 </script>
 
 <template>
-    <div>
-    <h1 class="text-purple-600">Tasks Page</h1>
-    <RouterLink to="/">Go To Home</RouterLink>
-    <RouterLink :to="{ name: '/tasks/[id]', params: { id: 1 } }"
-      >Go To Task with id</RouterLink
-    >
-    <ul>
-      <li v-for="task in tasks" :key="task.id">
-        {{ task.name }}
-      </li>
-    </ul>
-  </div>
+  <DataTable v-if="tasks" :columns="columns" :data="tasks" />
 </template>
