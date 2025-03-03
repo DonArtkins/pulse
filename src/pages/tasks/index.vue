@@ -1,27 +1,25 @@
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
-import { supabase } from "@/lib/supabaseClient";
 import { h, ref } from "vue";
-import type { Tables } from "../../../database/types";
 import type { ColumnDef } from "@tanstack/vue-table";
-import { usePageStore } from "@/stores/page";
+import {
+  tasksWithProjectsQuery,
+  type TasksWithProjects,
+} from "@/utils/superQueries";
 
-usePageStore().pageData.title = 'My Tasks'
-
-const tasks = ref<Tables<"tasks">[] | null>(null)
+const tasks = ref<TasksWithProjects | null>(null);
 
 const getTasks = async () => {
-  //imediately invoked function
-  const { data, error } = await supabase.from("tasks").select();
+  const { data, error } = await tasksWithProjectsQuery;
 
   if (error) console.log(error);
 
   tasks.value = data;
-}
+};
 
-await getTasks()
+await getTasks();
 
-const columns: ColumnDef<Tables<"tasks">>[] = [
+const columns: ColumnDef<TasksWithProjects[0]>[] = [
   {
     accessorKey: "name",
     header: () => h("div", { class: "text-left" }, "Name"),
@@ -29,35 +27,63 @@ const columns: ColumnDef<Tables<"tasks">>[] = [
       /**
        * The `h` tag is a vue fuction that returns html elements and it accepts 3 arguments (string to rep tag name or component instance, object that has properties for the attributes and finally the last argument and whatever is passed to it will be placed inside the element)
        */
-       return h(RouterLink, { to:`/tasks/${ row.original.id }`, class: "text-left font-medium hover:bg-muted" }, () => row.getValue("name"));
+      return h(
+        RouterLink,
+        {
+          to: `/tasks/${row.original.id}`,
+          class: "text-left font-medium hover:bg-muted",
+        },
+        () => row.getValue("name")
+      );
     },
   },
   {
     accessorKey: "status",
     header: () => h("div", { class: "text-left" }, "Status"),
     cell: ({ row }) => {
-      return h("div", { class: "text-left font-medium" }, row.getValue("status"));
+      return h(
+        "div",
+        { class: "text-left font-medium" },
+        row.getValue("status")
+      );
     },
   },
   {
     accessorKey: "due_date",
     header: () => h("div", { class: "text-left" }, "Due Date"),
     cell: ({ row }) => {
-      return h("div", { class: "text-left font-medium" }, row.getValue("due_date"));
+      return h(
+        "div",
+        { class: "text-left font-medium" },
+        row.getValue("due_date")
+      );
     },
   },
   {
-    accessorKey: "project_id",
-    header: () => h("div", { class: "text-left" }, "Project Id"),
+    accessorKey: "projects",
+    header: () => h("div", { class: "text-left" }, "Project"),
     cell: ({ row }) => {
-      return h("div", { class: "text-left font-medium" }, row.getValue("project_id"));
+      return row.original.projects
+        ? h(
+            RouterLink,
+            {
+              to: `/projects/${row.original.projects.slug}`,
+              class: "text-left font-medium hover:bg-muted",
+            },
+            () => row.original.projects?.name
+          )
+        : "";
     },
   },
   {
     accessorKey: "collaborators",
     header: () => h("div", { class: "text-left" }, "Collaborators"),
     cell: ({ row }) => {
-      return h("div", { class: "text-left font-medium" }, JSON.stringify(row.getValue("collaborators")));
+      return h(
+        "div",
+        { class: "text-left font-medium" },
+        JSON.stringify(row.getValue("collaborators"))
+      );
     },
   },
 ];
